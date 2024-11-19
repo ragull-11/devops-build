@@ -1,20 +1,35 @@
 pipeline {
     agent any
 
+    environment {
+        GIT_BRANCH = "${env.BRANCH_NAME}" // Use Jenkins pipeline variable
+    }
+
     stages {
-        stage('Build and Push Docker Image') {
+        stage('Build Docker Image') {
             steps {
-                // Grant executable permissions to the build script
                 sh 'chmod +x build.sh'
-                sh 'chmod +x deploy.sh'
-
-                // Build the Docker image using the build script
                 sh './build.sh'
-                sh './deploy.sh'
-
-                
             }
         }
 
+        stage('Deploy and Push Docker Image') {
+            steps {
+                sh 'chmod +x deploy.sh'
+                sh './deploy.sh'
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Pipeline execution completed.'
+        }
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed.'
+        }
     }
 }
