@@ -1,9 +1,10 @@
 #!/bin/bash
 
-# Use Jenkins' environment variable GIT_BRANCH
-export GIT_BRANCH=${GIT_BRANCH:-$(git rev-parse --abbrev-ref HEAD)}
-
+export GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 echo "Current branch inside script: $GIT_BRANCH"
+
+# Ensure the branch includes origin/
+GIT_BRANCH="origin/$GIT_BRANCH"
 
 if [[ $GIT_BRANCH == "origin/dev" ]]; then
     chmod +x build/build.sh
