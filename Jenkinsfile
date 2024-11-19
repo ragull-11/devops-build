@@ -19,7 +19,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    // Login to Docker Hub using credentials stored in Jenkins
+                    // Docker login using credentials from Jenkins (username and password)
                     sh """
                     echo $DOCKER_CREDENTIALS_PSW | docker login -u $DOCKER_CREDENTIALS_USR --password-stdin
                     """
