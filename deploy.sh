@@ -1,17 +1,33 @@
+
 #!/bin/bash
 
-# Run the container on port 80
-docker run -itd -p 80:80 my-react-app
+docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
 
-# Login to Docker Hub
-docker login -u ragul11 -p Ragul@docker2
+# Check which branch is being built
+if [ $GIT_BRANCH = "origin/dev" ]; then
+    # Build your project
+    chmod +x build.sh
+    ./build.sh
 
-# Tag and push based on branch
-if [[ $GIT_BRANCH == "dev" ]]; then
-    docker tag my-react-app ragul11/dev
-    docker push ragul11/dev
+    # Tag the Docker image for the dev environment
+    docker tag my-react-app $DOCKER_USERNAME/dev
 
-elif [[ $GIT_BRANCH == "master" ]]; then
-    docker tag my-react-app ragul11/prod
-    docker push ragul11/prod
+    # Push the Docker image to the dev repository
+    docker push $DOCKER_USERNAME/dev
+
+elif [$GIT_BRANCH = "origin/master"]; then
+    chmod +x build.sh
+    ./build.sh
+
+    # Tag the Docker image for the prod environment
+    docker tag my-react-app $DOCKER_USERNAME/prod
+
+    # Push the Docker image to the prod repository
+    docker push $DOCKER_USERNAME/prod
+else 
+    echo "Branch-not recognized. No build or push will occur."
+    exit 1
 fi
+
+docker-compose down || true
+docker-compose up -d
