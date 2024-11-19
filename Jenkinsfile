@@ -11,7 +11,6 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                     script {
-                        sh 'ls -la
                         sh 'chmod +x deploy.sh'
                         sh 'deploy.sh'
                     }
