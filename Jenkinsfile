@@ -4,10 +4,13 @@ pipeline {
     stages {
         stage('Build and Push Docker Image') {
             steps {
-                sh 'chmod +x build.sh'
+                // Grant executable permissions to the build script guvi
                 sh 'chmod +x deploy.sh'
-                sh './build.sh'
+
+                // Build the Docker image using the build script
                 sh './deploy.sh'
+
+                
             }
         }
 
