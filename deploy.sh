@@ -1,33 +1,39 @@
-
 #!/bin/bash
 
-docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+# Exit script on error
+set -e
 
-# Check which branch is being built
-if [ $GIT_BRANCH = "origin/dev" ]; then
-    # Build your project
+# Login securely to Docker Hub
+echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+
+# Branch-based deployment logic
+if [[ $GIT_BRANCH == "dev" ]]; then
+    echo "Building and pushing Docker image for dev environment..."
+
+    # Build the Docker image
     chmod +x build.sh
     ./build.sh
 
-    # Tag the Docker image for the dev environment
-    docker tag my-react-app $DOCKER_USERNAME/dev
+    # Tag and push the Docker image to the dev repository
+    docker tag my-react-app "$DOCKER_USERNAME/dev:latest"
+    docker push "$DOCKER_USERNAME/dev:latest"
 
-    # Push the Docker image to the dev repository
-    docker push $DOCKER_USERNAME/dev
+elif [[ $GIT_BRANCH == "master" ]]; then
+    echo "Building and pushing Docker image for prod environment..."
 
-elif [$GIT_BRANCH = "origin/master"]; then
+    # Build the Docker image
     chmod +x build.sh
     ./build.sh
 
-    # Tag the Docker image for the prod environment
-    docker tag my-react-app $DOCKER_USERNAME/prod
+    # Tag and push the Docker image to the prod repository
+    docker tag my-react-app "$DOCKER_USERNAME/prod:latest"
+    docker push "$DOCKER_USERNAME/prod:latest"
 
-    # Push the Docker image to the prod repository
-    docker push $DOCKER_USERNAME/prod
-else 
-    echo "Branch-not recognized. No build or push will occur."
+else
+    echo "Branch not recognized. Exiting..."
     exit 1
 fi
 
+# Restart the containers using Docker Compose
 docker-compose down || true
 docker-compose up -d
