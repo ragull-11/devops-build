@@ -1,35 +1,21 @@
 pipeline {
     agent any
 
-    environment {
-        GIT_BRANCH = "${env.BRANCH_NAME}" // Use Jenkins pipeline variable
+    triggers {
+        // Automatically trigger builds on GitHub push events
+        githubPush()
     }
 
     stages {
-        stage('Build Docker Image') {
+        stage('Build and Push Docker Image') {
             steps {
-                sh 'chmod +x build.sh'
-                sh './build.sh'
+                withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    script {
+                        sh 'chmod +x ./deploy.sh'
+                        sh './deploy.sh'
+                    }
+                }
             }
-        }
-
-        stage('Deploy and Push Docker Image') {
-            steps {
-                sh 'chmod +x deploy.sh'
-                sh './deploy.sh'
-            }
-        }
-    }
-
-    post {
-        always {
-            echo 'Pipeline execution completed.'
-        }
-        success {
-            echo 'Pipeline completed successfully!'
-        }
-        failure {
-            echo 'Pipeline failed.'
         }
     }
 }
