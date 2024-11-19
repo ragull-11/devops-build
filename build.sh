@@ -1,3 +1,4 @@
 #!/bin/bash
 
-docker build -t my-react-app .
+IMAGE_TAG="my-react-app:${GIT_BRANCH}"
+docker build -t $IMAGE_TAG .
