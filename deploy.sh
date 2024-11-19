@@ -1,6 +1,7 @@
 #!/bin/bash
 
-export GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+# Get the branch name, even in a detached HEAD state
+export GIT_BRANCH=$(git symbolic-ref --short HEAD || git rev-parse --short HEAD)
 echo "Current branch inside script: $GIT_BRANCH"
 
 # Ensure the branch includes origin/
