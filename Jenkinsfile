@@ -1,43 +1,25 @@
 pipeline {
     agent any
-    
-    environment {
-        DOCKER_CREDENTIALS = credentials('docker-hub-credentials') // Using Jenkins credentials for Docker Hub
+
+    triggers {
+        // Automatically trigger builds on GitHub push events
+        githubPush()
     }
 
     stages {
-        stage('Build') {
+        stage('Build and Push Docker Image') {
             steps {
-                // Grant executable permissions to the build script
-                sh 'chmod +x build.sh'
+                withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    script {
+                        // List files in the build directory to confirm location //
+                        sh 'ls -la build'
 
-                // Build the Docker image using the build script
-                sh './build.sh'
-            }
-        }
-
-        stage('Deploy') {
-            steps {
-                script {
-                    // Docker login using credentials from Jenkins (username and password)
-                    sh """
-                    echo $DOCKER_CREDENTIALS_PSW | docker login -u $DOCKER_CREDENTIALS_USR --password-stdin
-                    """
+                        // Use relative path to deploy.sh and ensure it's executable
+                        sh 'chmod +x build/deploy.sh'
+                        sh './build/deploy.sh'
+                    }
                 }
-
-                // Grant executable permissions to the deploy script
-                sh 'chmod +x deploy.sh'
-
-                // Deploy the Docker image using the deploy script
-                sh './deploy.sh'
             }
-        }
-    }
-
-    post {
-        always {
-            // Ensure Docker logout at the end of the pipeline
-            sh 'docker logout'
         }
     }
 }

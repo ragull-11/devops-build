@@ -1,39 +1,20 @@
 #!/bin/bash
 
-# Exit script on error
-set -e
+if [[ $GIT_BRANCH == "origin/dev" ]]; then
+    chmod +x build/build.sh
+    build/build.sh
+    docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+    docker tag my-react-app ragul11/dev
+    docker push ragul11/dev
 
-# Login securely to Docker Hub
-echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-
-# Branch-based deployment logic
-if [[ $GIT_BRANCH == "dev" ]]; then
-    echo "Building and pushing Docker image for dev environment..."
-
-    # Build the Docker image
-    chmod +x build.sh
-    ./build.sh
-
-    # Tag and push the Docker image to the dev repository
-    docker tag my-react-app "$DOCKER_USERNAME/dev:latest"
-    docker push "$DOCKER_USERNAME/dev:latest"
-
-elif [[ $GIT_BRANCH == "master" ]]; then
-    echo "Building and pushing Docker image for prod environment..."
-
-    # Build the Docker image
-    chmod +x build.sh
-    ./build.sh
-
-    # Tag and push the Docker image to the prod repository
-    docker tag my-react-app "$DOCKER_USERNAME/prod:latest"
-    docker push "$DOCKER_USERNAME/prod:latest"
+elif [[ $GIT_BRANCH == "origin/master" ]]; then
+    chmod +x build/build.sh
+    build/build.sh
+    docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+    docker tag my-react-app ragul11/prod
+    docker push ragul11/prod
 
 else
-    echo "Branch not recognized. Exiting..."
+    echo "Branch $GIT_BRANCH is not recognized. Exiting."
     exit 1
 fi
-
-# Restart the containers using Docker Compose
-docker-compose down || true
-docker-compose up -d
