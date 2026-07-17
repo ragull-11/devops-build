@@ -1,2 +1,6 @@
 .git
 .gitignore
+README.md
+node_modules
+learning-log
+docs

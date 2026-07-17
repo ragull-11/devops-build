@@ -1,8 +1,8 @@
-version: '3'
 services:
-    nginx:
-     image: "my-react-app"
-     ports:
+  web:
+    build: .
+    image: devops-build:local
+    container_name: devops-build-app
+    restart: unless-stopped
+    ports:
       - "80:80"
-     
-      
