@@ -4,6 +4,7 @@ pipeline {
     environment {
         DOCKERHUB_CREDS = credentials('dockerhub-creds')
         EC2_HOST = '3.109.58.80'
+        BUILD_PLATFORM = 'linux/amd64'
     }
 
     stages {
@@ -41,9 +42,9 @@ pipeline {
                     def imageTag = (env.BRANCH_NAME == 'master') ? 'ragul11/prod:latest' : 'ragul11/dev:latest'
                     sshagent(credentials: ['ec2-ssh-key']) {
                         sh """
-                            ssh -o StrictHostKeyChecking=no ubuntu@${EC2_HOST} '
-                                docker pull ${imageTag} &&
-                                docker rm -f devops-build-app || true &&
+                            ssh -o StrictHostKeyChecking=no ubuntu@${EC2_HOST} 'set -e
+                                docker pull ${imageTag}
+                                docker rm -f devops-build-app || true
                                 docker run -d -p 80:80 --name devops-build-app --restart unless-stopped ${imageTag}
                             '
                         """
