@@ -6,6 +6,7 @@ pipeline {
         EC2_HOST = '52.66.249.65'
         BUILD_PLATFORM = 'linux/amd64'
     }
+    stages {
 
     stages {
         stage('Checkout') {
