@@ -7,13 +7,6 @@ pipeline {
         BUILD_PLATFORM = 'linux/amd64'
     }
 
-    stages {
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
-
         stage('Build') {
             steps {
                 sh 'chmod +x build.sh deploy.sh'
