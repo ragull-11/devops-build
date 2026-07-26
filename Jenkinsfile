@@ -44,7 +44,9 @@ pipeline {
                         sh """
                             ssh -o StrictHostKeyChecking=no ubuntu@${EC2_HOST} 'set -e
                                 docker pull ${imageTag}
-                                docker rm -f devops-build-app || true
+				docker stop devops-build-app 2>/dev/null || true
+                                docker rm -f devops-build-app 2>/dev/null || true
+				sleep 1
                                 docker run -d -p 80:80 --name devops-build-app --restart unless-stopped ${imageTag}
                             '
                         """
