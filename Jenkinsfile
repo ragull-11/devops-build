@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKERHUB_CREDS = credentials('dockerhub-creds')
-        EC2_HOST = '3.109.58.80'
+        EC2_HOST = '52.66.249.65'
         BUILD_PLATFORM = 'linux/amd64'
     }
 
